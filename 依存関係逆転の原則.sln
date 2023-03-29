@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "依存関係逆転の原則", "依存関係逆転の原則\依存関係逆転の原則.csproj", "{9578D79B-1696-46A3-9408-C7F8491BF735}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "依存関係逆転の原則Tests", "依存関係逆転の原則Tests\依存関係逆転の原則Tests.csproj", "{DF5497BB-4DF3-4E1A-BCA9-0E096859F342}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9578D79B-1696-46A3-9408-C7F8491BF735}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9578D79B-1696-46A3-9408-C7F8491BF735}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9578D79B-1696-46A3-9408-C7F8491BF735}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9578D79B-1696-46A3-9408-C7F8491BF735}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF5497BB-4DF3-4E1A-BCA9-0E096859F342}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF5497BB-4DF3-4E1A-BCA9-0E096859F342}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF5497BB-4DF3-4E1A-BCA9-0E096859F342}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF5497BB-4DF3-4E1A-BCA9-0E096859F342}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2315D9B8-43D8-4FEC-B0C2-D1910684B141}
+	EndGlobalSection
+EndGlobal
