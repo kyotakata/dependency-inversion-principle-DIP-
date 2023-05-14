@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using Unity;
 using 依存関係逆転の原則.Objects;
 
 namespace 依存関係逆転の原則
@@ -19,12 +18,6 @@ namespace 依存関係逆転の原則
         [STAThread]
         static void Main()
         {
-            //IUnityContainer container = new UnityContainer();
-            ////このcontainerにこのインターフェースはこの依存性が入るように登録しておく
-            //container.RegisterType<IProduct, ProductFake>();//IProductを引数としているコンストラクタには自動的にProductSqlServer/ProductFakeがはまる(IProductにはProductSqlServer/ProductFakeの依存性を注入する。)ここでProductSqlServer/ProductFakeを切り替える、
-            //container.RegisterType<IStock, StockFack>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
-            //var vm = container.Resolve<Form1ViewModel>();　　　　// 上のRegisterTypeで登録しているものがForm1ViewModelのコンストラクタに注入されるようになる。その注入したものがvmに入ってくる。
-            //↓書き換え
             var vm = DI.Resolve<Form1ViewModel>();
 
             Application.EnableVisualStyles();
@@ -34,8 +27,9 @@ namespace 依存関係逆転の原則
 
         internal static class DI
         {
-            private static IUnityContainer _container = new UnityContainer();
+            private static ServiceCollection _container = new ServiceCollection();
             private static bool _isFake = false;
+            private static ServiceProvider _serviceProvider;
 
             /// <summary>
             /// コンストラクタ
@@ -43,16 +37,22 @@ namespace 依存関係逆転の原則
             /// </summary>
             static DI()
             {
+                // Microsoft Extensions DependencyInjectionの場合、Unityとは違い、事前にResolveする前にAddTransientしておかないといけない。シングルトンの場合はAddSingleton。今回は使い捨てなのでAddTransient。
+                _container.AddTransient<Form1ViewModel>();
+                _container.AddTransient<Form2ViewModel>();
+
                 if (_isFake)
                 {
-                    _container.RegisterType<IProduct, ProductFake>();//IProductを引数としているコンストラクタには自動的にProductFakeがはまる(IProductにはProductFakeの依存性を注入する)
-                    _container.RegisterType<IStock, StockFack>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
+                    _container.AddTransient<IProduct, ProductFake>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
+                    _container.AddTransient<IStock, StockFack>();//IProductを引数としているコンストラクタには自動的にStockFackがはまる
                 }
                 else
                 {
-                    _container.RegisterType<IProduct, ProductSqlServer>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる(IProductにはProductSqlServerの依存性を注入する)
-                    _container.RegisterType<IStock, StockFack>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
+                    _container.AddTransient<IProduct, ProductSqlServer>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
+                    _container.AddTransient<IStock, StockFack>();//IProductを引数としているコンストラクタには自動的にStockFackがはまる
                 }
+
+                _serviceProvider = _container.BuildServiceProvider();// ServiceCollectionクラスで出来上がった_containerを元に_serviceProviderを作る。
             }
 
             /// <summary>
@@ -61,10 +61,14 @@ namespace 依存関係逆転の原則
             /// <typeparam name="T"></typeparam>
             /// <returns></returns>
             internal static T Resolve<T>()
-            { 
-              return _container.Resolve<T>();
+            {
+                return _serviceProvider.GetRequiredService<T>();
+                // GetServiceとGetRequiredServiceがある。
+                // GetServiceだと依存性注入する対象がない場合nullが返る。
+                // GetRequiredServiceだと依存性注入する対象がない場合例外が返る。
             }
         }
 
     }
 }
+
