@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using Unity;
 using 依存関係逆転の原則.Objects;
 
 namespace 依存関係逆転の原則
@@ -19,10 +20,11 @@ namespace 依存関係逆転の原則
         static void Main()
         {
             //IUnityContainer container = new UnityContainer();
-            //container.RegisterType<IProduct, ProductFake>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる(IProductにはProductSqlServerの依存性を注入する)
+            ////このcontainerにこのインターフェースはこの依存性が入るように登録しておく
+            //container.RegisterType<IProduct, ProductFake>();//IProductを引数としているコンストラクタには自動的にProductSqlServer/ProductFakeがはまる(IProductにはProductSqlServer/ProductFakeの依存性を注入する。)ここでProductSqlServer/ProductFakeを切り替える、
             //container.RegisterType<IStock, StockFack>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
-            //var vm = container.Resolve<Form1ViewModel>();　　　　// RegisterTypeで登録しているものをForm1ViewModelのコンストラクタに注入したものがvmに入ってくる
-
+            //var vm = container.Resolve<Form1ViewModel>();　　　　// 上のRegisterTypeで登録しているものがForm1ViewModelのコンストラクタに注入されるようになる。その注入したものがvmに入ってくる。
+            //↓書き換え
             var vm = DI.Resolve<Form1ViewModel>();
 
             Application.EnableVisualStyles();
@@ -32,32 +34,35 @@ namespace 依存関係逆転の原則
 
         internal static class DI
         {
-            private static ServiceCollection _container = new ServiceCollection();
+            private static IUnityContainer _container = new UnityContainer();
             private static bool _isFake = false;
-            private static ServiceProvider _serviceProvider;
+
+            /// <summary>
+            /// コンストラクタ
+            /// staticのコンストラクタはstaticなメンバに触れた瞬間に動作する。一番最初にガチャンと決まる。ガチャンと設定しておけば、Resolveメソッドでとってくる値がどっちか決まる。
+            /// </summary>
             static DI()
             {
-
-                _container.AddTransient<Form1ViewModel>();
-                _container.AddTransient<Form2ViewModel>();
-
                 if (_isFake)
                 {
-                    _container.AddTransient<IProduct, ProductFake>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
-                    _container.AddTransient<IStock, StockFack>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
+                    _container.RegisterType<IProduct, ProductFake>();//IProductを引数としているコンストラクタには自動的にProductFakeがはまる(IProductにはProductFakeの依存性を注入する)
+                    _container.RegisterType<IStock, StockFack>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
                 }
                 else
                 {
-                    _container.AddTransient<IProduct, ProductSqlServer>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
-                    _container.AddTransient<IStock, StockFack>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
+                    _container.RegisterType<IProduct, ProductSqlServer>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる(IProductにはProductSqlServerの依存性を注入する)
+                    _container.RegisterType<IStock, StockFack>();//IProductを引数としているコンストラクタには自動的にProductSqlServerがはまる
                 }
-
-                _serviceProvider = _container.BuildServiceProvider();
             }
 
+            /// <summary>
+            /// 共通的に使用できるResolveメソッド
+            /// </summary>
+            /// <typeparam name="T"></typeparam>
+            /// <returns></returns>
             internal static T Resolve<T>()
             { 
-              return _serviceProvider.GetRequiredService<T>();//Form1ViewModelのコンストラクタに上で登録しているProductSqlServerをはめてくれる
+              return _container.Resolve<T>();
             }
         }
 

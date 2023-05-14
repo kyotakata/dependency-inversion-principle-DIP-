@@ -17,6 +17,11 @@ namespace 依存関係逆転の原則
         //{
         //}
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="stock">DIコンテナにより自動でインスタンスを注入する</param>
+        /// <param name="product">DIコンテナにより自動でインスタンスを注入する</param>
         public Form1ViewModel(IStock stock, IProduct product)
         {
             _product = product;
